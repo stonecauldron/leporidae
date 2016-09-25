@@ -1,3 +1,6 @@
+import uchicago.src.sim.analysis.DataSource;
+import uchicago.src.sim.analysis.OpenSequenceGraph;
+import uchicago.src.sim.analysis.Sequence;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
@@ -28,10 +31,11 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 
     // default values
-    private static final int NUM_AGENTS = 1;
+    private static final int NUM_AGENTS = 5;
     private static final int GRID_SIZE = 20;
-    private static final int BIRTH_THRESHOLD = 50;
-    private static final int GRASS_GROWTH = 100;
+    private static final int BIRTH_THRESHOLD = 60;
+    private static final int BIRTH_COST = 20;
+    private static final int GRASS_GROWTH = 10;
     private static final float GRASS_ENERGY = 1.5f;
     private static final int INITIAL_ENERGY = 50;
     private static final int MAX_GRASS_BY_CELL = 32;
@@ -52,6 +56,33 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     private DisplaySurface displaySurface;
 
 
+    private OpenSequenceGraph totalRabbitHisto;
+    private OpenSequenceGraph totalGrassHisto;
+
+
+    class TotalRabbit implements DataSource, Sequence {
+
+        public Object execute() {
+            return new Double(getSValue());
+        }
+
+        public double getSValue() {
+            return (double)agentList.size();
+        }
+
+    }
+
+    class TotalGrass implements DataSource, Sequence {
+
+        public Object execute() {
+            return new Double(getSValue());
+        }
+
+        public double getSValue() {
+            return (double)rbSpace.getTotalGrassInSpace();
+        }
+
+    }
 
 
     public static void main(String[] args) {
@@ -65,17 +96,31 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
     public void setup() {
         System.out.println("Running setup");
+
         rbSpace = null;
         agentList = new ArrayList();
         schedule = new Schedule(1);
 
+
         if (displaySurface != null) {
             displaySurface.dispose();
         }
-        displaySurface = null;
-
         displaySurface = new DisplaySurface(this, "Rabbits Window 1");
         registerDisplaySurface("Rabbits Window 1", displaySurface);
+
+
+        if(totalRabbitHisto != null){
+            totalRabbitHisto.dispose();
+        }
+        totalRabbitHisto = new OpenSequenceGraph("Total of living rabbits in space",this);
+        this.registerMediaProducer("Plot", totalRabbitHisto);
+
+        if(totalGrassHisto!= null){
+            totalGrassHisto.dispose();
+        }
+        totalGrassHisto = new OpenSequenceGraph("Total amount of grass in space",this);
+        this.registerMediaProducer("Plot", totalGrassHisto);
+
     }
 
 
@@ -85,6 +130,8 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         buildDisplay();
 
         displaySurface.display();
+        totalRabbitHisto.display();
+        totalGrassHisto.display();
     }
 
 
@@ -112,12 +159,30 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
                     RabbitsGrassSimulationAgent agnt =  agentList.get(i);
                     agnt.step();
                 }
+                makeBirth();
                 removeDeadAgents();
                 rbSpace.growGrass(grassGrowthRate);
                 displaySurface.updateDisplay();
             }
         }
         schedule.scheduleActionBeginning(0, new RabbitsGrassStep());
+
+
+        schedule.scheduleActionAtInterval(10, new BasicAction() {
+            @Override
+            public void execute() {
+                totalRabbitHisto.step();
+            }
+        });
+
+        schedule.scheduleActionAtInterval(10, new BasicAction() {
+            @Override
+            public void execute() {
+                totalGrassHisto.step();
+            }
+        });
+
+
     }
 
 
@@ -139,13 +204,35 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         displayAgents.setObjectList(agentList);
 
         displaySurface.addDisplayable(displayAgents, "Agents");
+
+        totalRabbitHisto.addSequence("Total rabbit in space", new TotalRabbit());
+        totalGrassHisto.addSequence("Total grass in space", new TotalGrass());
+
     }
 
 
     private void addNewAgent() {
         RabbitsGrassSimulationAgent a = new RabbitsGrassSimulationAgent(initialEnergy,grassEnergy);
-        agentList.add(a);
-        rbSpace.addAgent(a);
+        if(rbSpace.addAgent(a)) {
+            agentList.add(a);
+        }
+    }
+
+
+    private void makeBirth(){
+
+        int totalBirth = 0;
+        for(RabbitsGrassSimulationAgent agnt: agentList){
+            if(agnt.getEnergy()>=this.birthThreshold){
+                agnt.setEnergy(agnt.getEnergy()-BIRTH_COST);
+                totalBirth++;
+            }
+        }
+
+        for(int i=0;i<totalBirth; i++){
+            addNewAgent();
+        }
+
     }
 
 

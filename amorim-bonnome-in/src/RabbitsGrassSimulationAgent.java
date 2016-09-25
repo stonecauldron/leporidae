@@ -24,6 +24,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
     private RabbitsGrassSimulationSpace rbSpace=null;
 
 
+
     private enum DIRECTION{
         NORTH,EAST,SOUTH,WEST;
 
@@ -85,6 +86,10 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 
     public int getEnergy() {
         return energy;
+    }
+
+    public void setEnergy(int value){
+        this.energy = value;
     }
 
     public int getX() {

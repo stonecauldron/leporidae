@@ -120,6 +120,17 @@ public class RabbitsGrassSimulationSpace {
     }
 
 
+    public int getTotalGrassInSpace(){
+        int total = 0;
+
+        for(int x=0;x<grassSpace.getSizeX();x++){
+            for(int y=0;y<grassSpace.getSizeY();y++){
+                total += getGrassAt(x,y);
+            }
+        }
+
+        return total;
+    }
 
 
 }
