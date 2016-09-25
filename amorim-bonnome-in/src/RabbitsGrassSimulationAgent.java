@@ -6,9 +6,9 @@ import java.awt.*;
 
 
 /**
- * Class that implements the simulation agent for the rabbits grass simulation.
- *
- * @author
+ * A rabbit agent for the simulation.
+ * Our agent wander randomly on each step over a 2D space (torus)
+ * and is defined by is energy level.
  */
 
 public class RabbitsGrassSimulationAgent implements Drawable {
@@ -25,6 +25,10 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 
 
 
+    /**
+     * DIRECTION ENUM : NORTH,EAST,SOUTH,WEST
+     * help to define the next coordinates where the rabbit should go.
+     */
     private enum DIRECTION{
         NORTH,EAST,SOUTH,WEST;
 
@@ -45,17 +49,29 @@ public class RabbitsGrassSimulationAgent implements Drawable {
                    fromY;
         }
 
-
     }
 
-    public RabbitsGrassSimulationAgent(int initialEnergy, float grassEnergy) {
+
+    /**
+     *
+     * @param initialEnergy : initial energy of the agent
+     * @param grassEnergy : convertion grass => energy
+     * @param rbSpace : rabbits/grass space
+     */
+    public RabbitsGrassSimulationAgent(
+            int initialEnergy,
+            float grassEnergy,
+            RabbitsGrassSimulationSpace rbSpace) {
 
         this.energy = initialEnergy;
         this.grassEnergy = grassEnergy;
+        this.rbSpace = rbSpace;
     }
 
 
-
+    /**
+     * update local position of the rabbit, position over the shared space and local energy.
+     */
     public void step() {
 
         DIRECTION inDir = DIRECTION.rnd();
@@ -64,55 +80,87 @@ public class RabbitsGrassSimulationAgent implements Drawable {
         int newX = ( inDir.displacedX(x)+grid.getSizeX() ) % grid.getSizeX();
         int newY = ( inDir.displacedY(y)+grid.getSizeY() ) % grid.getSizeY();
 
-        if (tryMove(newX, newY)) {
+        // if move succeed
+        if (rbSpace.moveAgentAt(x, y, newX, newY)) {
             energy += grassEnergy*rbSpace.eatGrassAt(x, y);
         }
 
         energy--;
     }
 
-
+    /**
+     * used by repast to draw the rabbit on the space
+     */
+    @Override
     public void draw(SimGraphics G) {
         G.drawFastRoundRect(Color.white);
     }
 
+    /**
+     * print information about the agent
+     */
     public void report() {
-        System.out.println(getID() + "," + getX() + "," + getY() + "," + getEnergy());
+
+        System.out.println(getID() + ","
+                        + getX()
+                        + "," + getY()
+                        + "," + getEnergy());
     }
 
+    /**
+     *
+     * @return the id of the agent
+     */
     public String getID() {
         return "A-" + ID;
     }
 
+
+    /**
+     *
+     * @return the energy of the agent
+     */
     public int getEnergy() {
         return energy;
     }
 
+
+    /**
+     *
+     * @param value : energy
+     * put the agent's energy to the given value
+     */
     public void setEnergy(int value){
         this.energy = value;
     }
 
+    /**
+     *
+     * @return the x position of the agent
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     *
+     * @return the y position of the agent
+     */
     public int getY() {
         return y;
     }
 
+
+    /**
+     *
+     * @param newX
+     * @param newY
+     * set the position of the agent to the given parameters
+     */
     public void setXY(int newX, int newY) {
         this.x = newX;
         this.y = newY;
     }
-
-    public void setRbSpace(RabbitsGrassSimulationSpace spc) {
-        rbSpace = spc;
-    }
-
-    private boolean tryMove(int newX, int newY) {
-        return rbSpace.moveAgentAt(x, y, newX, newY);
-    }
-
 
 
 }

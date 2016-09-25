@@ -21,7 +21,6 @@ import java.util.List;
  * order to run Repast simulation. It manages the entire RePast
  * environment and the simulation.
  *
- * @author
  */
 
 
@@ -56,28 +55,44 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     private DisplaySurface displaySurface;
 
 
-    private OpenSequenceGraph totalRabbitHisto;
-    private OpenSequenceGraph totalGrassHisto;
+    private OpenSequenceGraph totalRabbitHisto, totalGrassHisto;
 
 
+
+
+    /**
+     * Class executed by scheduler to construct histogram.
+     * It counts the total number of living rabbits.
+     *
+     */
     class TotalRabbit implements DataSource, Sequence {
 
+        @Override
         public Object execute() {
             return new Double(getSValue());
         }
 
+        @Override
         public double getSValue() {
             return (double)agentList.size();
         }
 
     }
 
+
+
+    /**
+     * Class executed by scheduler to construct histogram.
+     * It counts the total number of grass available on the space.
+     */
     class TotalGrass implements DataSource, Sequence {
 
+        @Override
         public Object execute() {
             return new Double(getSValue());
         }
 
+        @Override
         public double getSValue() {
             return (double)rbSpace.getTotalGrassInSpace();
         }
@@ -85,6 +100,12 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     }
 
 
+
+    /**
+     *
+     * @param args
+     * instanciate a new simulation and the model.
+     */
     public static void main(String[] args) {
         SimInit init = new SimInit();
         RabbitsGrassSimulationModel model = new RabbitsGrassSimulationModel();
@@ -93,7 +114,11 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 
 
-
+    /**
+     *
+     * reset and setup the simulation before running it.
+     */
+    @Override
     public void setup() {
         System.out.println("Running setup");
 
@@ -124,6 +149,11 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     }
 
 
+    /**
+     * Use by repast when the user want to start a new simulation.
+     * it build the model, the scheduler and the display.
+     */
+    @Override
     public void begin() {
         buildModel();
         buildSchedule();
@@ -135,7 +165,10 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     }
 
 
-    public void buildModel() {
+    /**
+     * build the model based on the simulation values
+     */
+    private void buildModel() {
         System.out.println("Running buildmodel");
         rbSpace = new RabbitsGrassSimulationSpace(gridSize,MAX_GRASS_BY_CELL);
         for (int i = 0; i < numAgents; i++) {
@@ -148,8 +181,10 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     }
 
 
-
-    public void buildSchedule() {
+    /**
+     * build the schedule
+     */
+    private void buildSchedule() {
         System.out.println("Running buildSchedule");
 
         class RabbitsGrassStep extends BasicAction {
@@ -186,8 +221,10 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     }
 
 
-
-    public void buildDisplay() {
+    /**
+     * build the display of the simulation
+     */
+    private void buildDisplay() {
         System.out.println("Running buildDisplay");
 
         ColorMap map = new ColorMap();
@@ -211,14 +248,23 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     }
 
 
+
+    /**
+     * add a new agent in the simulation.
+     */
     private void addNewAgent() {
-        RabbitsGrassSimulationAgent a = new RabbitsGrassSimulationAgent(initialEnergy,grassEnergy);
+        RabbitsGrassSimulationAgent a = new RabbitsGrassSimulationAgent(initialEnergy,grassEnergy, rbSpace);
         if(rbSpace.addAgent(a)) {
             agentList.add(a);
         }
     }
 
 
+    /**
+     * create new agent in the simulation for all agents having their energy upper than
+     * the birthThreshold. All agents that give birth to a new rabbit will have their energy
+     * decrease by the BIRTH_COST.
+     */
     private void makeBirth(){
 
         int totalBirth = 0;
@@ -236,6 +282,9 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     }
 
 
+    /**
+     * remove all agents having less than 1 point of energy
+     */
     private void removeDeadAgents() {
         for (int i = 0; i < agentList.size(); i++) {
             RabbitsGrassSimulationAgent agnt = agentList.get(i);
@@ -246,58 +295,104 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         }
     }
 
+
+    /**
+     *
+     * @return parameters that can be changed on repast
+     */
     public String[] getInitParam() {
         String[] initParams = {"NumAgents", "GridSize", "BirthThreshold", "GrassGrowthRate"};
         return initParams;
     }
 
 
-
-
+    /**
+     *
+     * @return the name of the simulation
+     */
     public String getName() {
         return "Rabbits";
     }
 
+    /**
+     *
+     * @return the scheduler of the simulation
+     */
     public Schedule getSchedule() {
         return schedule;
     }
 
+    /**
+     *
+     * @return the total number of agents available at the start of the simulation
+     */
     public int getNumAgents() {
         return numAgents;
     }
 
+    /**
+     *
+     * parametrize total number of agents available at the start of the simulation
+     */
     public void setNumAgents(int na) {
         numAgents = na;
     }
 
+    /**
+     *
+     * @return the grid dimension
+     */
     public int getGridSize() {
         return gridSize;
     }
 
+    /**
+     * parametrize the grid dimension
+     */
     public void setGridSize(int gridSize) {
         this.gridSize = gridSize;
     }
 
+    /**
+     * @return the birthThreeshold parameters used to define at which level rabbit reproduces
+     */
     public int getBirthThreshold() {
         return birthThreshold;
     }
 
+    /**
+     * set the birthThreeshold parameters used to define at which level rabbit reproduces
+     */
     public void setBirthThreshold(int birthThreshold) {
         this.birthThreshold = birthThreshold;
     }
 
+    /**
+     * @return the total number of grass added at each step
+     */
     public int getGrassGrowthRate() {
         return grassGrowthRate;
     }
 
+    /**
+     * set the total number of grass added at each step
+     */
     public void setGrassGrowthRate(int grassGrowthRate) {
         this.grassGrowthRate = grassGrowthRate;
     }
 
+
+    /**
+     * @return the initial energy given to the rabbits
+    */
     public int getInitialEnergy() {
         return initialEnergy;
     }
 
+
+    /**
+     * set the initial energy given to the rabbits
+     */
     public void setInitialEnergy(int e) {
         initialEnergy = e;
     }
