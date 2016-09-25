@@ -7,56 +7,75 @@ import uchicago.src.sim.space.Object2DGrid;
  */
 
 public class RabbitsGrassSimulationSpace {
+
+
+
     private Object2DGrid grassSpace;
     private Object2DGrid agentSpace;
 
-    public RabbitsGrassSimulationSpace(int gridSize) {
-        grassSpace = new Object2DGrid(gridSize, gridSize);
-        agentSpace = new Object2DGrid(gridSize, gridSize);
+    private int maxGrassByCell = 0;
+
+
+
+    public RabbitsGrassSimulationSpace(int gridSize, int maxGrassByCell) {
+
+        this.grassSpace = new Object2DGrid(gridSize, gridSize);
+        this.agentSpace = new Object2DGrid(gridSize, gridSize);
 
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                grassSpace.putObjectAt(i, j, 0);
+                this.grassSpace.putObjectAt(i, j, 0);
             }
         }
+
+        this.maxGrassByCell = maxGrassByCell;
+
     }
 
-    public void growGrass(int grass, int grassEnergy) {
-        int count = 0;
-        while (count < grass) {
+
+    public void growGrass(int grass) {
+
+        for(int i = 0; i<grass; i++) {
             int x = (int) (Math.random() * (grassSpace.getSizeX()));
             int y = (int) (Math.random() * (grassSpace.getSizeY()));
-
-            if (isCellOccupied(x, y, grassSpace)) {
-                grassSpace.putObjectAt(x, y, 1);
-                count++;
-            }
+            int newValue = Math.min(getGrassAt(x, y) + 1, maxGrassByCell);
+            grassSpace.putObjectAt(x, y, newValue);
         }
+
     }
+
 
     public int getGrassAt(int x, int y) {
-        int i;
-        if (grassSpace.getObjectAt(x, y) != null) {
-            i = (int) grassSpace.getObjectAt(x, y);
-        } else {
-            i = 0;
+
+        boolean isOutside = x<0 || y<0 || x>=grassSpace.getSizeX() || y>= grassSpace.getSizeY();
+
+        if(isOutside){
+            return 0;
         }
-        return i;
+
+        return (int)grassSpace.getObjectAt(x, y);
+
     }
+
 
     public Object2DGrid getGrassSpace() {
         return grassSpace;
     }
 
+
     public Object2DGrid getAgentSpace() {
         return agentSpace;
     }
+
+
 
     public boolean isCellOccupied(int x, int y, Object2DGrid grid) {
         boolean retValue = false;
         if (grid.getObjectAt(x, y) != null) retValue = true;
         return retValue;
     }
+
+
 
     public boolean addAgent(RabbitsGrassSimulationAgent agent) {
         boolean retVal = false;
@@ -99,6 +118,10 @@ public class RabbitsGrassSimulationSpace {
         }
         return retVal;
     }
+
+
+
+
 }
 
 

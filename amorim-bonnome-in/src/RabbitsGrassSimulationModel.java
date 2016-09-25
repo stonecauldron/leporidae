@@ -10,6 +10,7 @@ import uchicago.src.sim.util.SimUtilities;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that implements the simulation model for the rabbits grass
@@ -22,34 +23,45 @@ import java.util.ArrayList;
 
 
 public class RabbitsGrassSimulationModel extends SimModelImpl {
+
+
+
+
     // default values
-    private static final int NUM_AGENTS = 100;
+    private static final int NUM_AGENTS = 1;
     private static final int GRID_SIZE = 20;
     private static final int BIRTH_THRESHOLD = 50;
-    private static final int GRASS_GROWTH = 1;
-    private static final int GRASS_ENERGY = 10;
+    private static final int GRASS_GROWTH = 100;
+    private static final float GRASS_ENERGY = 1.5f;
     private static final int INITIAL_ENERGY = 50;
+    private static final int MAX_GRASS_BY_CELL = 32;
 
     private int numAgents = NUM_AGENTS;
     private int gridSize = GRID_SIZE;
     private int birthThreshold = BIRTH_THRESHOLD;
     private int grassGrowthRate = GRASS_GROWTH;
-    private int grassEnergy = GRASS_ENERGY;
+    private float grassEnergy = GRASS_ENERGY;
     private int initialEnergy = INITIAL_ENERGY;
 
     private Schedule schedule;
 
     private RabbitsGrassSimulationSpace rbSpace;
 
-    private ArrayList agentList;
+    private List<RabbitsGrassSimulationAgent> agentList;
 
     private DisplaySurface displaySurface;
+
+
+
 
     public static void main(String[] args) {
         SimInit init = new SimInit();
         RabbitsGrassSimulationModel model = new RabbitsGrassSimulationModel();
         init.loadModel(model, "", false);
     }
+
+
+
 
     public void setup() {
         System.out.println("Running setup");
@@ -66,6 +78,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         registerDisplaySurface("Rabbits Window 1", displaySurface);
     }
 
+
     public void begin() {
         buildModel();
         buildSchedule();
@@ -74,17 +87,20 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         displaySurface.display();
     }
 
+
     public void buildModel() {
         System.out.println("Running buildmodel");
-        rbSpace = new RabbitsGrassSimulationSpace(gridSize);
+        rbSpace = new RabbitsGrassSimulationSpace(gridSize,MAX_GRASS_BY_CELL);
         for (int i = 0; i < numAgents; i++) {
             addNewAgent();
         }
         for (int i = 0; i < agentList.size(); i++) {
-            RabbitsGrassSimulationAgent rba = (RabbitsGrassSimulationAgent) agentList.get(i);
+            RabbitsGrassSimulationAgent rba = agentList.get(i);
             rba.report();
         }
     }
+
+
 
     public void buildSchedule() {
         System.out.println("Running buildSchedule");
@@ -93,16 +109,18 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
             public void execute() {
                 SimUtilities.shuffle(agentList);
                 for (int i = 0; i < agentList.size(); i++) {
-                    RabbitsGrassSimulationAgent agnt = (RabbitsGrassSimulationAgent) agentList.get(i);
+                    RabbitsGrassSimulationAgent agnt =  agentList.get(i);
                     agnt.step();
                 }
                 removeDeadAgents();
-                rbSpace.growGrass(grassGrowthRate, grassEnergy);
+                rbSpace.growGrass(grassGrowthRate);
                 displaySurface.updateDisplay();
             }
         }
         schedule.scheduleActionBeginning(0, new RabbitsGrassStep());
     }
+
+
 
     public void buildDisplay() {
         System.out.println("Running buildDisplay");
@@ -110,7 +128,9 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         ColorMap map = new ColorMap();
 
         map.mapColor(0, Color.black);
-        map.mapColor(1, new Color(0, (int) (127), 0));
+        for(int i = 1; i<=MAX_GRASS_BY_CELL; i++){
+            map.mapColor(i, new Color(0, 127+i*4, 0));
+        }
 
         Value2DDisplay displayGrass = new Value2DDisplay(rbSpace.getGrassSpace(), map);
         displaySurface.addDisplayable(displayGrass, "Grass");
@@ -121,15 +141,17 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         displaySurface.addDisplayable(displayAgents, "Agents");
     }
 
+
     private void addNewAgent() {
-        RabbitsGrassSimulationAgent a = new RabbitsGrassSimulationAgent(initialEnergy);
+        RabbitsGrassSimulationAgent a = new RabbitsGrassSimulationAgent(initialEnergy,grassEnergy);
         agentList.add(a);
         rbSpace.addAgent(a);
     }
 
+
     private void removeDeadAgents() {
         for (int i = 0; i < agentList.size(); i++) {
-            RabbitsGrassSimulationAgent agnt = (RabbitsGrassSimulationAgent) agentList.get(i);
+            RabbitsGrassSimulationAgent agnt = agentList.get(i);
             if (agnt.getEnergy() < 1) {
                 rbSpace.removeAgentAt(agnt.getX(), agnt.getY());
                 agentList.remove(i);
@@ -141,6 +163,9 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         String[] initParams = {"NumAgents", "GridSize", "BirthThreshold", "GrassGrowthRate"};
         return initParams;
     }
+
+
+
 
     public String getName() {
         return "Rabbits";
@@ -189,4 +214,6 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     public void setInitialEnergy(int e) {
         initialEnergy = e;
     }
+
+
 }

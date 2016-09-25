@@ -3,8 +3,6 @@ import uchicago.src.sim.gui.SimGraphics;
 import uchicago.src.sim.space.Object2DGrid;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
 
 
 /**
@@ -14,47 +12,64 @@ import java.util.List;
  */
 
 public class RabbitsGrassSimulationAgent implements Drawable {
-    private int x;
-    private int y;
-    private int vX;
-    private int vY;
-    private int energy;
+
+
+
     private static int IDNumber = 0;
-    private int ID;
-    private RabbitsGrassSimulationSpace rbSpace;
+    private int ID = IDNumber++;
 
-    public RabbitsGrassSimulationAgent(int initialEnergy) {
-        x = -1;
-        y = -1;
-        energy = initialEnergy;
-        IDNumber++;
-        ID = IDNumber;
-    }
+    private int x = -1,y=-1;
+    private int energy;
+    private float grassEnergy;
+    private RabbitsGrassSimulationSpace rbSpace=null;
 
-    private void setVxVy() {
-        vX = 0;
-        vY = 0;
-        while ((vX == 0) && (vY == 0)) {
-            vX = (int) Math.floor(Math.random() * 3) -1;
-            vY = (int) Math.floor(Math.random() * 3) -1;
+
+    private enum DIRECTION{
+        NORTH,EAST,SOUTH,WEST;
+
+        public static DIRECTION rnd(){
+            int tmp = (int)(Math.random()*4);
+            return DIRECTION.values()[tmp];
         }
+
+        public int displacedX(int fromX){
+            return this == EAST ? fromX +1:
+                   this == WEST ? fromX-1:
+                   fromX;
+        }
+
+        public int displacedY(int fromY){
+            return this == NORTH ? fromY-1:
+                   this == SOUTH ? fromY+1:
+                   fromY;
+        }
+
+
     }
+
+    public RabbitsGrassSimulationAgent(int initialEnergy, float grassEnergy) {
+
+        this.energy = initialEnergy;
+        this.grassEnergy = grassEnergy;
+    }
+
+
 
     public void step() {
-        int newX = x + vX;
-        int newY = y + vY;
 
+        DIRECTION inDir = DIRECTION.rnd();
         Object2DGrid grid = rbSpace.getAgentSpace();
-        newX = (newX + grid.getSizeX()) % grid.getSizeX();
-        newY = (newY + grid.getSizeY()) % grid.getSizeY();
+
+        int newX = ( inDir.displacedX(x)+grid.getSizeX() ) % grid.getSizeX();
+        int newY = ( inDir.displacedY(y)+grid.getSizeY() ) % grid.getSizeY();
 
         if (tryMove(newX, newY)) {
-            energy += rbSpace.eatGrassAt(x, y);
-        } else {
-            setVxVy();
+            energy += grassEnergy*rbSpace.eatGrassAt(x, y);
         }
+
         energy--;
     }
+
 
     public void draw(SimGraphics G) {
         G.drawFastRoundRect(Color.white);
@@ -81,8 +96,8 @@ public class RabbitsGrassSimulationAgent implements Drawable {
     }
 
     public void setXY(int newX, int newY) {
-        x = newX;
-        y = newY;
+        this.x = newX;
+        this.y = newY;
     }
 
     public void setRbSpace(RabbitsGrassSimulationSpace spc) {
@@ -92,5 +107,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
     private boolean tryMove(int newX, int newY) {
         return rbSpace.moveAgentAt(x, y, newX, newY);
     }
+
+
 
 }

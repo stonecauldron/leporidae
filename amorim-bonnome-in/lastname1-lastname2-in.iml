@@ -10,5 +10,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="library" name="repast" level="project" />
     <orderEntry type="library" name="colt" level="project" />
+    <orderEntry type="library" name="jsolver" level="project" />
   </component>
 </module>
