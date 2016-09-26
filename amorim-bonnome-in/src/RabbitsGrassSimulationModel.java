@@ -31,7 +31,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     // default values
     private static final int NUM_AGENTS = 5;
     private static final int GRID_SIZE = 20;
-    private static final int BIRTH_THRESHOLD = 60;
+    private static final int BIRTH_THRESHOLD = 80;
     private static final int BIRTH_COST = 20;
     private static final int GRASS_GROWTH = 10;
     private static final float GRASS_ENERGY = 1.5f;
