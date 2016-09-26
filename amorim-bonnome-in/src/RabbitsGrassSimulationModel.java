@@ -54,7 +54,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     private DisplaySurface displaySurface;
 
 
-    private OpenSequenceGraph totalRabbitHisto, totalGrassHisto;
+    private OpenSequenceGraph populationGraph;
 
 
 
@@ -92,7 +92,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
         @Override
         public double getSValue() {
-            return (double)rbSpace.getTotalGrassInSpace();
+            return (double)rbSpace.getTotalGrassInSpace()/10;
         }
 
     }
@@ -132,18 +132,11 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         registerDisplaySurface("Rabbits Window 1", displaySurface);
 
 
-        if(totalRabbitHisto != null){
-            totalRabbitHisto.dispose();
+        if(populationGraph != null){
+            populationGraph.dispose();
         }
-        totalRabbitHisto = new OpenSequenceGraph("Total of living rabbits in space",this);
-        this.registerMediaProducer("Plot", totalRabbitHisto);
-
-        if(totalGrassHisto!= null){
-            totalGrassHisto.dispose();
-        }
-        totalGrassHisto = new OpenSequenceGraph("Total amount of grass in space",this);
-        this.registerMediaProducer("Plot", totalGrassHisto);
-
+        populationGraph = new OpenSequenceGraph("Population graph",this);
+        this.registerMediaProducer("Plot", populationGraph);
     }
 
 
@@ -158,8 +151,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         buildDisplay();
 
         displaySurface.display();
-        totalRabbitHisto.display();
-        totalGrassHisto.display();
+        populationGraph.display();
     }
 
 
@@ -204,18 +196,9 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
         schedule.scheduleActionAtInterval(10, new BasicAction() {
             @Override
             public void execute() {
-                totalRabbitHisto.step();
+                populationGraph.step();
             }
         });
-
-        schedule.scheduleActionAtInterval(10, new BasicAction() {
-            @Override
-            public void execute() {
-                totalGrassHisto.step();
-            }
-        });
-
-
     }
 
 
@@ -240,8 +223,8 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
         displaySurface.addDisplayable(displayAgents, "Agents");
 
-        totalRabbitHisto.addSequence("Total rabbit in space", new TotalRabbit());
-        totalGrassHisto.addSequence("Total grass in space", new TotalGrass());
+        populationGraph.addSequence("rabbits", new TotalRabbit());
+        populationGraph.addSequence("grass", new TotalGrass());
 
     }
 

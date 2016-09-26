@@ -3,6 +3,8 @@
 \usepackage{amsmath}
 \usepackage{textcomp}
 \usepackage[top=0.8in, bottom=0.8in, left=0.8in, right=0.8in]{geometry}
+\usepackage{graphicx}
+\graphicspath{ {img/} }
 % Add other packages here %
 
 
@@ -47,6 +49,7 @@ Our model made the following assumptions:
   spread randomly. The amount of grass in a cell is implemented as an integer
   value. The bounding of the grass amount is simply implemented by taking the
   minimum of the maximum amount of grass in a cell and the updated value.
+\end{itemize}
   
 \section{Results}
 % In this section, you study and describe how different variables (e.g. birth threshold, grass growth rate etc.) or combinations of variables influence the results. Different experiments with different settings are described below with your observations and analysis
@@ -57,8 +60,15 @@ Our model made the following assumptions:
 \begin{itemize}
 \item Birth threshold: 80 units of energy
 \item Grass growth rate: 10 units of grass per time step
-\item Grid size: 20 \cross 20 units
+\item Grid size: $20\times 20$ units
 \item Initial number of agents: 5
+\end{itemize}
+
+\begin{figure}[h]
+  \caption{Population plot of experiment 1}
+  \includegraphics[width=0.75\textwidth]{experiment1}
+  \centering
+\end{figure}
 
 \subsubsection{Observations}
 % Elaborate on the observed results %
@@ -75,17 +85,35 @@ cycle restarts.
 \subsection{Experiment 2}
 
 \subsubsection{Setting}
+Same as Experiment 1 but the birth threshold was changed to 60 units of energy.
+
+\begin{figure}[h]
+  \caption{Population plot of experiment 2}
+  \includegraphics[width=0.75\textwidth]{experiment2}
+  \centering
+\end{figure}
 
 \subsubsection{Observations}
 % Elaborate on the observed results %
+Since the birth threshold is lower, the population of rabbits increases much
+more quickly. Overpopulation makes the competition for resources intense up
+until the point where there is almost no grass left and the rabbits go extinct.
 
-\vdots
-
-\subsection{Experiment n}
+\subsection{Experiment 3}
 
 \subsubsection{Setting}
+Same as experiment 1 but the grass growth rate was doubled.
+
+\begin{figure}[h]
+  \caption{Population plot of experiment 3}
+  \includegraphics[width=0.75\textwidth]{experiment3}
+  \centering
+\end{figure}
 
 \subsubsection{Observations}
 % Elaborate on the observed results %
+In this setting the grass is consumed at the same rate at which it grows. The
+rabbits' deaths and births are also balanced. This results in population numbers
+with almost no fluctuation.
 
 \end{document}
