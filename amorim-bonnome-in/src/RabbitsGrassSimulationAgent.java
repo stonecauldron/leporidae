@@ -7,8 +7,8 @@ import java.awt.*;
 
 /**
  * A rabbit agent for the simulation.
- * Our agent wander randomly on each step over a 2D space (torus)
- * and is defined by is energy level.
+ * Our agent wanders randomly at each step over a 2D space (torus)
+ * and is defined by its energy level.
  */
 
 public class RabbitsGrassSimulationAgent implements Drawable {
@@ -27,7 +27,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
 
     /**
      * DIRECTION ENUM : NORTH,EAST,SOUTH,WEST
-     * help to define the next coordinates where the rabbit should go.
+     * helper enum to facilitate the rabbit's movement
      */
     private enum DIRECTION{
         NORTH,EAST,SOUTH,WEST;
@@ -55,7 +55,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
     /**
      *
      * @param initialEnergy : initial energy of the agent
-     * @param grassEnergy : convertion grass => energy
+     * @param grassEnergy : conversion grass => energy
      * @param rbSpace : rabbits/grass space
      */
     public RabbitsGrassSimulationAgent(
@@ -80,7 +80,7 @@ public class RabbitsGrassSimulationAgent implements Drawable {
         int newX = ( inDir.displacedX(x)+grid.getSizeX() ) % grid.getSizeX();
         int newY = ( inDir.displacedY(y)+grid.getSizeY() ) % grid.getSizeY();
 
-        // if move succeed
+        // if move succeeded
         if (rbSpace.moveAgentAt(x, y, newX, newY)) {
             energy += grassEnergy*rbSpace.eatGrassAt(x, y);
         }
@@ -161,6 +161,4 @@ public class RabbitsGrassSimulationAgent implements Drawable {
         this.x = newX;
         this.y = newY;
     }
-
-
 }

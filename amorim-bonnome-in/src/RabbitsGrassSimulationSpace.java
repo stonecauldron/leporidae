@@ -2,8 +2,8 @@ import uchicago.src.sim.space.Object2DGrid;
 
 /**
  * Class that implements the simulation space of the rabbits grass simulation.
- * It store the agent on a 2D space and the total amount of grass by cell.
- * The total amount of grass are bounded to 32 unit by cell.
+ * It stores the agents on a 2D space and the total amount of grass by cell.
+ * The total amount of grass is bounded by 32 units per cell.
  */
 
 public class RabbitsGrassSimulationSpace {
@@ -19,7 +19,7 @@ public class RabbitsGrassSimulationSpace {
      * @param gridSize
      * @param maxGrassByCell
      *
-     * instanciate the space without agent and with 0 unit grass by cell.
+     * instantiate the space without agents and with 0 units of grass per cell
      */
     public RabbitsGrassSimulationSpace(int gridSize, int maxGrassByCell) {
 
@@ -41,8 +41,7 @@ public class RabbitsGrassSimulationSpace {
      *
      * @param grass
      * randomly spread the total amount of grass into the 2DSpace.
-     * If a unit is assgined to a cell that already have 32 unit of grass,
-     * the surplus is drop.
+     * If a unit is assigned to a cell that already has 32 units of grass drop it
      */
     public void growGrass(int grass) {
 
@@ -98,7 +97,7 @@ public class RabbitsGrassSimulationSpace {
      * @param x
      * @param y
      * @param grid
-     * @return true if the cell already contains a value that's not null
+     * @return true if the cell already contains a value that is not null
      */
     public boolean isCellOccupied(int x, int y, Object2DGrid grid) {
         boolean retValue = false;
@@ -193,66 +192,3 @@ public class RabbitsGrassSimulationSpace {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

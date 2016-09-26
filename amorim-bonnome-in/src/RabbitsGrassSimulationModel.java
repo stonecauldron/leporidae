@@ -20,7 +20,6 @@ import java.util.List;
  * simulation.  This is the first class which needs to be setup in
  * order to run Repast simulation. It manages the entire RePast
  * environment and the simulation.
- *
  */
 
 
@@ -61,9 +60,8 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 
     /**
-     * Class executed by scheduler to construct histogram.
-     * It counts the total number of living rabbits.
-     *
+     * Class executed by the scheduler to construct a histogram of
+     * the rabbit's population.
      */
     class TotalRabbit implements DataSource, Sequence {
 
@@ -82,8 +80,8 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 
     /**
-     * Class executed by scheduler to construct histogram.
-     * It counts the total number of grass available on the space.
+     * Class executed by the scheduler to construct a histogram of
+     * the total amount of grass in the simulation
      */
     class TotalGrass implements DataSource, Sequence {
 
@@ -104,7 +102,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     /**
      *
      * @param args
-     * instanciate a new simulation and the model.
+     * instantiate a new simulation and the model.
      */
     public static void main(String[] args) {
         SimInit init = new SimInit();
@@ -150,8 +148,8 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 
     /**
-     * Use by repast when the user want to start a new simulation.
-     * it build the model, the scheduler and the display.
+     * Used by repast when the user want to start a new simulation.
+     * it builds the model, the scheduler and the display.
      */
     @Override
     public void begin() {
@@ -261,9 +259,9 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 
     /**
-     * create new agent in the simulation for all agents having their energy upper than
+     * create a new agent in the simulation for all agents that have their energy levels above
      * the birthThreshold. All agents that give birth to a new rabbit will have their energy
-     * decrease by the BIRTH_COST.
+     * levels decrease by the BIRTH_COST.
      */
     private void makeBirth(){
 
@@ -283,7 +281,7 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
 
 
     /**
-     * remove all agents having less than 1 point of energy
+     * remove all agents that have less than 1 point of energy left
      */
     private void removeDeadAgents() {
         for (int i = 0; i < agentList.size(); i++) {
@@ -396,6 +394,4 @@ public class RabbitsGrassSimulationModel extends SimModelImpl {
     public void setInitialEnergy(int e) {
         initialEnergy = e;
     }
-
-
 }
